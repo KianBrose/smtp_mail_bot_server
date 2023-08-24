@@ -8,8 +8,8 @@ Long name isn't it, it's basically just a program meant to be able to read email
 
 Long story short, refferal type giveaways were pissing me off since they're unfair to people with few friends when compared to influencers that abuse the refferal system, so a modified version of this was used to 
 
-## [Full video about this project available here](https://www.youtube.com/KianBrose)
-I made a video about this, you should watch it [here](https://www.youtube.com/KianBrose)
+## [Full video about this project available here](https://youtu.be/UTqAF8VgBxM)
+I made a video about this, you should watch it [here](https://youtu.be/UTqAF8VgBxM)
 ## Features
 
 - Read mail from a custom domain
@@ -48,7 +48,7 @@ On whatever computer you are running you will have to make sure your router is p
 ### Code changes
 In the `handle_RCPT` function, change the domain `kianbrose.com` to `example.com` (obviously yours in there)
 
-At the bottom of the script, change the `hostname='192.168.x.x'` set it to your own private ipv4
+At the bottom of the script, change the `hostname='192.168.x.x'` set it to your own private ipv4 ONLY IF 0.0.0.0 RESULTS IN PORT FORWARDING NOT WORKING (Sometimes some operating systems ask that you explicitly use the 192.168 address otherwise port forwarding does not work, like windows)
 
 ## Running
 It will probably complain if you don't use sudo permissions, run as admin on windows or on mac/linux `sudo python main.py`
