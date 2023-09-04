@@ -22,15 +22,17 @@ class MailHandler:
 
         # If you want to print EVERYTHING in the mail
         # including useless information, use this
-        # print('Message data:\n')
-        # for ln in envelope.content.decode('utf8', errors='replace').splitlines():
-        #    print(f'> {ln}'.strip())
+        print("Message data:\n")
+        for ln in envelope.content.decode("utf8", errors="replace").splitlines():
+            print(f"> {ln}".strip())
 
         # This code is to just read the text part of the email
         # in other words the useful part that we actually, as in
         # the actual text inside the mail
         plain_text_part = None
         email_message = message_from_bytes(envelope.content)
+        subject = email_message["Subject"]
+        print(f"Subject: {subject}")
         for part in email_message.walk():
             if part.get_content_type() == "text/plain":
                 plain_text_part = part.get_payload(decode=True).decode("utf-8")
