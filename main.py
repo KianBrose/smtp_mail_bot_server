@@ -2,6 +2,8 @@ import asyncio
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
 
+from firebase_handler import FirebaseHandler
+
 
 class MailHandler:
     async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
@@ -12,41 +14,50 @@ class MailHandler:
         return "250 OK"
 
     async def handle_DATA(self, server, session, envelope):
-        print("Message from %s" % envelope.mail_from)
-
-        # This is a string array of who it was sent to
-        # like ['bob@xxxx.com','jeff@xxxx.com']
-        # it can have a length of 1 if theres only 1
-        # person it was sent to
-        print("Message for %s" % envelope.rcpt_tos)
-
-        # If you want to print EVERYTHING in the mail
-        # including useless information, use this
-        print("Message data:\n")
-        for ln in envelope.content.decode("utf8", errors="replace").splitlines():
-            print(f"> {ln}".strip())
-
-        # This code is to just read the text part of the email
-        # in other words the useful part that we actually, as in
-        # the actual text inside the mail
-        plain_text_part = None
-        email_message = message_from_bytes(envelope.content)
-        subject = email_message["Subject"]
-        print(f"Subject: {subject}")
-        for part in email_message.walk():
-            if part.get_content_type() == "text/plain":
-                plain_text_part = part.get_payload(decode=True).decode("utf-8")
-                break
-        if plain_text_part:
-            # Do something with the plain text part
-            print("Plain text content:")
-            print(plain_text_part)
+        # print("Message from %s" % envelope.mail_from)
+        #
+        # # This is a string array of who it was sent to
+        # # like ['bob@xxxx.com','jeff@xxxx.com']
+        # # it can have a length of 1 if theres only 1
+        # # person it was sent to
+        # print("Message for %s" % envelope.rcpt_tos)
+        #
+        # # If you want to print EVERYTHING in the mail
+        # # including useless information, use this
+        # print("Message data:\n")
+        # for ln in envelope.content.decode("utf8", errors="replace").splitlines():
+        #     print(f"> {ln}".strip())
+        #
+        # # This code is to just read the text part of the email
+        # # in other words the useful part that we actually, as in
+        # # the actual text inside the mail
+        # plain_text_part = None
+        # email_message = message_from_bytes(envelope.content)
+        # subject = email_message["Subject"]
+        # print(f"Subject: {subject}")
+        # for part in email_message.walk():
+        #     if part.get_content_type() == "text/plain":
+        #         plain_text_part = part.get_payload(decode=True).decode("utf-8")
+        #         break
+        # if plain_text_part:
+        #     # Do something with the plain text part
+        #     print("Plain text content:")
+        #     print(plain_text_part)
 
         # This is to finish the mail and see that it finished
         # it can be removed, just visual
-        print()
-        print("End of message")
-        return "250 Message accepted for delivery"
+        sender = envelope.mail_from
+        recipient = envelope.rcpt_tos[0]
+        text_lines = []
+        for ln in envelope.content.decode("utf8", errors="replace").splitlines():
+            text_lines.append(f"> {ln}".strip())
+
+        email_content = "\n".join(text_lines)
+        firebase_handler: FirebaseHandler = FirebaseHandler()
+
+        await firebase_handler.add_email_to_firebase(sender_email_address=sender,
+                                                     recipient_email_address=recipient,
+                                                     message=email_content)
 
 
 # Here you start the actual server, hostname is your PRIVATE ipv4, and port has to be 25
